@@ -33,4 +33,5 @@ The solution follows the [Bancolombia Hexagonal Architecture Scaffold](https://g
 Clone the repository and from the root run:
 
 ```bash
+# Make sure you created the .env file first!
 docker-compose up --build
