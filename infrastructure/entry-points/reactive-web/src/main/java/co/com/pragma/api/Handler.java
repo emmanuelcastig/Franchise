@@ -15,7 +15,7 @@ public class Handler {
     private final FranchiseUseCase franchiseUseCase;
     private final FranchiseMapper franchiseMapper;
 
-    // 2. Crear franquicia
+    // Crear franquicia
     public Mono<ServerResponse> createFranchise(ServerRequest request) {
         return request.bodyToMono(FranchiseRequest.class)
                 .map(franchiseMapper::toEntity)                // DTO -> Domain
@@ -23,7 +23,7 @@ public class Handler {
                 .flatMap(dto -> ServerResponse.status(HttpStatus.CREATED).bodyValue(dto));
     }
 
-    // 3. Agregar sucursal
+    // Agregar sucursal
     public Mono<ServerResponse> addBranch(ServerRequest request) {
         String franchiseId = request.pathVariable("id");
         return request.bodyToMono(BranchRequest.class)
@@ -33,7 +33,7 @@ public class Handler {
                 .flatMap(dto -> ServerResponse.status(HttpStatus.CREATED).build());
     }
 
-    // 4. Agregar producto
+    // Agregar producto
     public Mono<ServerResponse> addProduct(ServerRequest request) {
         String franchiseId = request.pathVariable("id");
         String branchName = request.pathVariable("branch");
@@ -45,7 +45,7 @@ public class Handler {
                 .flatMap(dto -> ServerResponse.ok().bodyValue(dto));
     }
 
-    // 5. Eliminar producto
+    // Eliminar producto
     public Mono<ServerResponse> removeProduct(ServerRequest request) {
         String franchiseId = request.pathVariable("id");
         String branchName = request.pathVariable("branch");
@@ -56,7 +56,7 @@ public class Handler {
                 .flatMap(dto -> ServerResponse.ok().bodyValue(dto));
     }
 
-    // 6. Actualizar stock
+    // Actualizar stock
     public Mono<ServerResponse> updateStock(ServerRequest request) {
         String franchiseId = request.pathVariable("id");
         String branchName = request.pathVariable("branch");
@@ -69,7 +69,7 @@ public class Handler {
                 .flatMap(dto -> ServerResponse.ok().bodyValue(dto));
     }
 
-    // 7. Obtener max stock por sucursal
+    // Obtener max stock por sucursal
     public Mono<ServerResponse> getMaxStockPerBranch(ServerRequest request) {
         String franchiseId = request.pathVariable("id");
 
@@ -79,5 +79,38 @@ public class Handler {
                         .toList()
                 )
                 .flatMap(dtoList -> ServerResponse.ok().bodyValue(dtoList));
+    }
+
+    // Actualizar nombre de la franquicia
+    public Mono<ServerResponse> updateFranchiseName(ServerRequest request) {
+        String franchiseId = request.pathVariable("id");
+        return request.bodyToMono(UpdateNameRequest.class)
+                .flatMap(req -> franchiseUseCase.updateFranchiseName(franchiseId, req.getName()))
+                .map(franchiseMapper::toResponse)
+                .flatMap(dto -> ServerResponse.ok().bodyValue(dto));
+    }
+
+    // Actualizar nombre de una sucursal
+    public Mono<ServerResponse> updateBranchName(ServerRequest request) {
+        String franchiseId = request.pathVariable("id");
+        String oldBranchName = request.pathVariable("branch");
+        return request.bodyToMono(UpdateNameRequest.class)
+                .flatMap(req -> franchiseUseCase.updateBranchName(franchiseId, oldBranchName,
+                        req.getName()))
+                .map(franchiseMapper::toResponse)
+                .flatMap(dto -> ServerResponse.ok().bodyValue(dto));
+    }
+
+    // Actualizar nombre de un producto
+    public Mono<ServerResponse> updateProductName(ServerRequest request) {
+        String franchiseId = request.pathVariable("id");
+        String branchName = request.pathVariable("branch");
+        String oldProductName = request.pathVariable("product");
+
+        return request.bodyToMono(UpdateNameRequest.class)
+                .flatMap(req -> franchiseUseCase.updateProductName(franchiseId, branchName,
+                        oldProductName, req.getName()))
+                .map(franchiseMapper::toResponse)
+                .flatMap(dto -> ServerResponse.ok().bodyValue(dto));
     }
 }
