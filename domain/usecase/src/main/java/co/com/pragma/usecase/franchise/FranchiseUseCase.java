@@ -138,4 +138,61 @@ public class FranchiseUseCase {
 
     // DTO de respuesta para el caso de uso getMaxStockPerBranch
     public record ProductWithBranch(String branchName, String productName, int stock) {}
+
+    // Actualizar nombre de una franquicia
+    public Mono<Franchise> updateFranchiseName(String franchiseId, String newName) {
+        return franchiseRepository.findById(franchiseId)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Franchise not found")))
+                .flatMap(franchise -> {
+                    franchise.setName(newName);
+                    return franchiseRepository.save(franchise);
+                });
+    }
+
+    // Actualizar nombre de una sucursal
+    public Mono<Franchise> updateBranchName(String franchiseId, String oldBranchName, String newBranchName) {
+        return franchiseRepository.findById(franchiseId)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Franchise not found")))
+                .flatMap(franchise -> {
+                    Branch branch = franchise.getBranches().stream()
+                            .filter(b -> b.getName().equals(oldBranchName))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (branch == null) {
+                        return Mono.error(new IllegalArgumentException("Branch not found"));
+                    }
+
+                    branch.setName(newBranchName);
+                    return franchiseRepository.save(franchise);
+                });
+    }
+
+    // Actualizar nombre de un producto
+    public Mono<Franchise> updateProductName(String franchiseId, String branchName, String oldProductName, String newProductName) {
+        return franchiseRepository.findById(franchiseId)
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("Franchise not found")))
+                .flatMap(franchise -> {
+                    Branch branch = franchise.getBranches().stream()
+                            .filter(b -> b.getName().equals(branchName))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (branch == null) {
+                        return Mono.error(new IllegalArgumentException("Branch not found"));
+                    }
+
+                    Product product = branch.getProducts().stream()
+                            .filter(p -> p.getName().equals(oldProductName))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (product == null) {
+                        return Mono.error(new IllegalArgumentException("Product not found"));
+                    }
+
+                    product.setName(newProductName);
+                    return franchiseRepository.save(franchise);
+                });
+    }
 }
