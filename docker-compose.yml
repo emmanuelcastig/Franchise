@@ -9,10 +9,11 @@ services:
     ports:
       - "8080:8080"
     environment:
-      MONGO_URI: mongodb+srv://franchise_user:franchise1234@franchise-db.sdicteb.mongodb.net/franchise_db?retryWrites=true&w=majority&appName=franchise-db
+      MONGO_URI: ${MONGO_URI}
     networks:
       - franchise-net
 
 networks:
   franchise-net:
     driver: bridge
+
