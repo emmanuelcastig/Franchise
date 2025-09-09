@@ -1,16 +1,16 @@
 package co.com.pragma.api.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductRequest {
-    @NotBlank(message = "The name of the product is mandatory")
-    private String name;
+public class ProductWithBranchResponse {
+    private String branchName;
+    private String productName;
     private int stock;
 }
-

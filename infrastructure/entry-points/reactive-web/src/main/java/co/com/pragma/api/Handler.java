@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Set;
@@ -84,13 +85,12 @@ public class Handler {
 
     public Mono<ServerResponse> getMaxStockPerBranch(ServerRequest request) {
         String franchiseId = request.pathVariable("id");
-
-        return franchiseUseCase.getMaxStockPerBranch(franchiseId)
-                .map(list -> list.stream()
-                        .map(franchiseMapper::toMaxStockResponse)
-                        .toList()
-                )
-                .flatMap(dtoList -> ServerResponse.ok().bodyValue(dtoList));
+        return ServerResponse.ok()
+                .body(
+                        franchiseUseCase.getMaxStockPerBranch(franchiseId)
+                                .map(franchiseMapper::toMaxStockResponse),
+                        ProductWithBranchResponse.class
+                );
     }
     // Actualizar nombre de la franquicia
 

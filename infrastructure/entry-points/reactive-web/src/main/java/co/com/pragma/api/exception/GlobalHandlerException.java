@@ -1,5 +1,7 @@
 package co.com.pragma.api.exception;
 
+import co.com.pragma.usecase.franchise.enums.TechnicalMessage;
+import co.com.pragma.usecase.franchise.exception.BusinessException;
 import jakarta.validation.ValidationException;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.core.annotation.Order;
@@ -23,7 +25,11 @@ public class GlobalHandlerException implements ErrorWebExceptionHandler {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         String message = ex.getMessage();
 
-        if (ex instanceof ValidationException) {
+        if (ex instanceof BusinessException businessEx) {
+            TechnicalMessage tm = businessEx.getTechnicalMessage();
+            status = HttpStatus.BAD_REQUEST;
+            message = tm.getMessage();
+        } else if (ex instanceof ValidationException) {
             status = HttpStatus.BAD_REQUEST;
         } else if (ex instanceof IllegalArgumentException) {
             status = HttpStatus.BAD_REQUEST;
